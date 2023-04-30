@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QDialog, QPushButton, QVBoxLayout, QFileDialog, QApplication
+from PyQt5.QtWidgets import QDialog, QPushButton, QVBoxLayout, QFileDialog, QApplication, QLabel
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -32,6 +32,7 @@ class Window(QDialog):
 
         layout.addWidget(self.toolbar_1)
         layout.addWidget(self.canvas_1)
+        self.label = QLabel("Жду")
 
         # layout.addWidget(self.toolbar_2)
         # layout.addWidget(self.canvas_2)
@@ -40,6 +41,7 @@ class Window(QDialog):
         # layout.addWidget(self.canvas_3)
 
         layout.addWidget(self.button)
+        layout.addWidget(self.label)
 
         self.setLayout(layout)
 
@@ -47,17 +49,22 @@ class Window(QDialog):
         wb_patch = QFileDialog.getOpenFileName()[0]
         eeg = read_data(wb_patch)
         peak_locs = pan_tompkins(eeg, 5000)
+        print(len(peak_locs))
+        buckets = [-75] * len(peak_locs)
+        self.label.setText('Количество найденных пиков ' + str(len(peak_locs)))
 
         self.figure_1.clear()
         # self.figure_2.clear()
         # self.figure_3.clear()
 
-        ax_1 = self.figure_1.add_subplot(111)
+        ax_1 = self.figure_1.add_subplot(1, 1, 1)
         # ax_2 = self.figure_2.add_subplot()
         # ax_3 = self.figure_3.add_subplot()
 
         ax_1.plot(eeg)
         ax_1.scatter(peak_locs, eeg[peak_locs], c='r', marker='o')
+        ax_1.scatter(peak_locs, buckets, c='g', marker='o')
+
         # ax_2.plot(filter_function_emg)
         # ax_3.plot(function_emg)
         # ax_3.plot(filter_function_emg)
